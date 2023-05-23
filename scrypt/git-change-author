@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Usage: git change-author "Old Name" "Old Email" "New Name" "New Email"
+# Example: git change-author "Old Name" "old@example.com" "New Name" "new@example.com"
+
+old_name="$1"
+old_email="$2"
+new_name="$3"
+new_email="$4"
+
+if [ -z "$old_name" ] || [ -z "$old_email" ] || [ -z "$new_name" ] || [ -z "$new_email" ]; then
+    echo "Error: Both old and new name and email are required."
+    echo "Usage: git change-author \"Old Name\" \"Old Email\" \"New Name\" \"New Email\""
+    exit 1
+fi
+
+git filter-repo --force --commit-callback '
+if commit.author_email == b"'$old_email'":
+    commit.author_name = b"'$new_name'"
+    commit.author_email = b"'$new_email'"
+if commit.committer_email == b"'$old_email'":
+    commit.committer_name = b"'$new_name'"
+    commit.committer_email = b"'$new_email'"
+'
