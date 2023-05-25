@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# The provided script is a Bash shell script designed to examine all subdirectories 
+# in the current directory, and for each directory that contains a .git folder 
+# (indicating it is a Git repository), the script will identify whether there are any 
+# commits that have not been pushed to the remote repository. If such commits are detected, 
+# the script prints out a list of unpushed commits in a human-readable format.
+
+for dir in */; do
+    if [ -d "$dir/.git" ]; then
+        cd "$dir"
+        
+        current_branch=$(git branch --show-current)
+        local_commit=$(git rev-parse ${current_branch})
+        remote_commit=$(git rev-parse @{u} 2>/dev/null)
+
+        if [ $? -eq 0 ] && [ "$local_commit" != "$remote_commit" ]; then
+            echo "Unpushed commits in $dir:"
+            git log --pretty=oneline --abbrev-commit ${remote_commit}..${current_branch}
+        fi
+
+        cd ..
+    fi
+done
