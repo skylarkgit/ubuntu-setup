@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Usage: git commit-date "message" "date"
+# Example: git commit-date "Add new feature" "2023-05-01T12:00:00"
+
+commit_message="$1"
+commit_date="$2"
+
+if [ -z "$commit_message" ]; then
+    echo "Error: Commit message is required."
+    exit 1
+fi
+
+if [ -z "$commit_date" ]; then
+    echo "Error: Commit date is required."
+    exit 1
+fi
+
+export GIT_AUTHOR_DATE="$commit_date"
+export GIT_COMMITTER_DATE="$commit_date"
+
+git commit -m "$commit_message"
+
+unset GIT_AUTHOR_DATE
+unset GIT_COMMITTER_DATE
